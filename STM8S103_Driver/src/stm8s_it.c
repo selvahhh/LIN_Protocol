@@ -446,11 +446,23 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
     */
    //while(UART1_GetFlagStatus(UART1_FLAG_RXNE) == SET)
     {
-      u8UartMessage[u8UartIcounter] = UART1->DR;
-      u8UartIcounter++;
+      u8UartMessage[u8UartIcounter] = UART1_ReceiveData8();
+      //if(u8UartMessage[u8UartIcounter]==0x55) // Header is first byte which is specified to indicate start new frame, can not be used for cmd or data
+      //{
+        //u8UartIcounter=0;
+        //u8UartIcounter++;
+      //}
+      //else
+      //{
+        u8UartIcounter++;
+      //}
+      if(u8UartIcounter==5)
+      {
+        u8UartIcounter=0;
+        upacMsg.msgUpdate = true;
+      }
     }
    
-   //mode.modePd2 = 1;
  }
 #endif /* (STM8S208) || (STM8S207) || (STM8S103) || (STM8S903) || (STM8AF62Ax) || (STM8AF52Ax) */
 

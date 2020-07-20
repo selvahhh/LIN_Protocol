@@ -27,36 +27,6 @@
 #define CRC16_POLYNOM 0XA001
 #define CRC16_BITS 8
 
-#define TPS_WRITE_CMD_ONE_BYTE          0X87
-#define TPS_WRITE_CMD_TWO_BYTE          0X99
-#define TPS_WRITE_CMD_THREE_BYTE        0X1E
-#define TPS_WRITE_CMD_FOUR_BYTE         0XAA
-#define TPS_WRITE_CMD_TWELVE_BYTE       0X2D
-#define TPS_WRITE_CMD_SIXTEEN_BYTE      0X33
-#define TPS_WRITE_CMD_THIRTYTWO_BYTE    0XB4
-
-#define TPS_READ_CMD_ONE_BYTE          0X4B
-#define TPS_READ_CMD_TWO_BYTE          0XCC
-#define TPS_READ_CMD_THREE_BYTE        0XD2
-#define TPS_READ_CMD_FOUR_BYTE         0X55
-#define TPS_READ_CMD_TWELVE_BYTE       0XE1
-#define TPS_READ_CMD_SIXTEEN_BYTE      0X66
-#define TPS_READ_CMD_THIRTYTWO_BYTE    0X78
-
-#define TPS_DEVICE_ID_000               0X20
-#define TPS_DEVICE_ID_001               0X61
-#define TPS_DEVICE_ID_010               0XE2
-#define TPS_DEVICE_ID_100               0X64
-
-#define TPS_BRODCAST_WRITE_ID           0XBF
-
-#define TPS_SYSCFG_ADDR                 0X80
-#define TPS_SYSCFG_CONFIG               0X84
-
-#define TPS_LED_POSTION_MIN_ID_000      20
-//#define TPS_LED_POSTION_MAX_ID_000      31
-#define TPS_LED_POSTION_MIN_ID_010      4
-#define TPS_LED_POSTION_MAX_ID_010      15
 
 #define ADC_MIN_VALUE                   400
 
@@ -84,12 +54,7 @@ void Write_Flash_Byte(uint32_t add, uint8_t value);
 void Mcu_init(void);
 void Uart_vidResetUart(void);
 uint16_t Crc16_u16CalCrc16(uint8_t *u8Packet,uint8_t u8Number);
-uint8_t *Tps_u8CalCrc16(uint8_t *u8Header,uint8_t *u8Packet,uint8_t u8NumberHeader,uint8_t u8NumberPacket);
-void IIC_Master_Init(void);
-//void IIC_Write_Byte(uint8_t DeviceAddress, uint8_t Address_MSB,uint8_t Address_LSB,uint8_t *Content);
-//uint16_t IIC_ReadOneByteAddr_Byte(uint8_t DeviceAddress, uint8_t Address_MSB,uint8_t Address_LSB);
-//void  IIC_Start();
-//void IIC_Stop();
+uint8_t *Lin_u8CalCrc16(uint8_t *u8Header,uint8_t *u8Packet,uint8_t u8NumberHeader,uint8_t u8NumberPacket);
 void Mcu_AdcRun();
 
 
@@ -105,27 +70,33 @@ typedef struct event{
   uint8_t modeAdcDimming:1;
 }event;
 
+typedef struct uartPackage{
+  bool msgUpdate;
+  uint8_t msgCmd;
+  uint16_t msgData; 
+}uartPackage;
+
 typedef enum LRtype{
  LEFT = 0,
  RIGHT = 1
 }LRtype;
 
-void Tps_RunMode();
+void Lin_RunMode();
+uint8_t Lin_parity(uint8_t data);
 LRtype Left_Right_selection(void);
 
 extern LRtype lrTypeSel;
 extern event mode;
 extern uint8_t *CRC16_u8Value;
-extern uint8_t u8LedPosDeviceId[2];
-extern uint8_t *Tps_u8LedPosDeviceId;
-extern uint8_t TPS_u8InfoFrame[9];
-extern uint8_t TPS_u8DataInit[4];
+
 extern uint16_t u16AdcValue;
 extern uint16_t u16AdcValueStore;
 extern bool     bRelayTrigger;
 extern bool     bButtonControlTrigger;
-extern uint8_t u8UartMessage[8];
+extern uint8_t u8UartMessage[5];
 extern uint8_t u8UartIcounter;
+extern uint8_t u8ParityData;
+extern uartPackage upacMsg;
 
 //extern uint16_t TPS_u8WidthData[32];
 

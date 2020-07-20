@@ -3,8 +3,8 @@
 * @file    main.c
 * @author  Selva He
 * @version V0.1
-* @date    7-Dec-2017
-* @brief   Three versions:NFC only, U4C only, NFC with U4C. each version can be enabled in hal.h file.
+* @date    20-July-2020
+* @brief   UART communication compatiable with LIN
 *          
 ******************************************************************************
 */ 
@@ -21,11 +21,6 @@ LRtype lrTypeSel;
 uint8_t u8TempVar = 0;
 uint16_t u16TempCrc16Value = 0;
 
-uint8_t TPS_u8TpsInitHeader[3] = {TPS_WRITE_CMD_ONE_BYTE,TPS_BRODCAST_WRITE_ID,TPS_SYSCFG_ADDR};
-uint8_t TPS_u8SysCfg[1] = {0x84};
-uint8_t TPS_u8Data[2] = {0,0};
-uint8_t TPS_u8DataInit[4] = {0x00,0x00,0x00,0x02}; //Phase + Width
-uint8_t TPS_u8InfoFrame[9]={0,0,0,0,0,0,0,0,0}; //Header:3, Data:4, CRC16:2
 
 uint8_t *CRC16_u8Value=NULL;
 uint8_t *Tps_u8LedPosDeviceId=NULL;
@@ -35,8 +30,10 @@ uint16_t u16AdcValue=0;
 uint16_t u16AdcValueStore=0;
 bool     bRelayTrigger = false;
 bool     bButtonControlTrigger = false;
-uint8_t u8UartMessage[8]={0xff};
+uint8_t u8UartMessage[5]={0xff};
 uint8_t u8UartIcounter = 0;
+uint8_t u8ParityData = 0;
+uartPackage upacMsg;
 
 
 
@@ -62,12 +59,12 @@ void delay_nms(uint16_t n)
 void main( void )
 { 
   Mcu_init();
-  delay_nms(200);
+  //delay_nms(200);
   Uart_vidResetUart();
   //Timer2_Config(); 
   //IWDG_Config();
-  delay_nms(800);
-  Tps_RunMode();
+  //delay_nms(800);
+  Lin_RunMode();
   UART1_ITConfig(UART1_IT_RXNE_OR,ENABLE);
   while(1)
   {
@@ -75,7 +72,12 @@ void main( void )
     //Mcu_AdcRun();
     //Tps_RunMode();
     //delay_nms(50);
-    GPIO_WriteHigh(GPIOC,GPIO_PIN_3);                    
+    GPIO_WriteHigh(GPIOC,GPIO_PIN_3);  
+    if(upacMsg.msgUpdate == true)
+    {
+      upacMsg.msgUpdate = false;
+      Lin_RunMode();
+    }
   }   
 }
 #ifdef USE_FULL_ASSERT
